@@ -39,5 +39,6 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="801a153e-ce08-4a0e-b666-8965ccaecee0" message="#[%dw 2.0&#10;output application/csv&#10;---&#10;payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1a59e9a9-be11-4967-b398-cef9aa87e60a" message="Additional logger added flow ended"/>
 	</flow>
 </mule>
