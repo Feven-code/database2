@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="database2Flow" doc:id="cb44d62e-91d2-451f-9118-df20e48730e4" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="61d95599-e8b6-4e26-a968-fef17bbc1d66" config-ref="HTTP_Listener_config" path="/test"/>
+		<db:select doc:name="Select" doc:id="1142bd88-c31a-4280-b565-36388cd5d639" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from employees WHERE employe_id= :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"ID":payload
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2da7103a-bd1f-400c-a7e2-9415e33958ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="0162b7be-d7b8-4d36-b49b-42a20265758c" message="#[%dw 2.0&#10;output application/csv&#10;---&#10;payload]"/>
+	</flow>
+	<flow name="database2Flow1" doc:id="1270c342-029d-480a-9b22-b28d8b8e7e81" >
+		<db:listener doc:name="On Table Row" doc:id="00935f81-52d9-4476-8a2e-2c9b9a3f431d" config-ref="Database_Config" table="employees" watermarkColumn="employe_id" idColumn="employe_id">
+			<scheduling-strategy >
+				<fixed-frequency frequency="20000"/>
+			</scheduling-strategy>
+		</db:listener>
+		<ee:transform doc:name="Transform Message" doc:id="b882f937-0eb1-46e0-8243-0992eb416f6d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="801a153e-ce08-4a0e-b666-8965ccaecee0" message="#[%dw 2.0&#10;output application/csv&#10;---&#10;payload]"/>
+	</flow>
+</mule>
